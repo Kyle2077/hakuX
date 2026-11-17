@@ -45,6 +45,11 @@ jobs:
           echo "ANDROID_NDK=$ANDROID_HOME/ndk/29.0.14206865" >> "$GITHUB_ENV"
           echo "$ANDROID_HOME/cmake/3.31.5/bin" >> "$GITHUB_PATH"
 
+      - name: Verify Gradle environment
+        working-directory: android
+        # Override the machine-specific Java path in gradle.properties.
+        run: bash ./gradlew -Dorg.gradle.java.home="$JAVA_HOME" --version
+
       - name: Fetch pinned native sources
         run: |
           git submodule update --init external/fex
@@ -72,7 +77,7 @@ jobs:
 
       - name: Run Android unit tests and assemble Debug APK
         working-directory: android
-        run: bash ./gradlew --no-daemon --max-workers=2 testDebugUnitTest assembleDebug --stacktrace
+        run: bash ./gradlew -Dorg.gradle.java.home="$JAVA_HOME" --no-daemon --max-workers=2 testDebugUnitTest assembleDebug --stacktrace
 
       - name: Verify APK contents and signature
         run: |
