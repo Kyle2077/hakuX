@@ -39,6 +39,20 @@ libraries in, then build the APK.
 
 ## Steps
 
+To fetch the table's exact revisions into `build/native-deps`, including
+adrenotools' submodule and the existing KGSL patch, run from the repository
+root:
+
+```
+bash tools/native/fetch-deps.sh
+```
+
+The script uses full commit IDs (including `nv2a_vsh_cpu`'s `561fe80`),
+which also work for commits outside the current branch history. It uses a
+GitHub mirror of the unchanged libslirp 4.7.0 commit. Pass a directory as
+the first argument to use another location; existing checkouts at other
+revisions are rejected instead of overwritten. Initialize FEX as above.
+
 From the repository root:
 
 ```
@@ -59,6 +73,25 @@ APK packs whatever is there.
 A release build (`assembleRelease`) is signed with the keystore that
 `key.properties` names (`storeFile`, `storePassword`, `keyAlias`,
 `keyPassword`).
+
+## GitHub Actions
+
+The `Android Debug APK` workflow builds on pull requests, pushes to `master`
+or `ci/**`, and manual dispatch. Manual dispatch becomes available once the
+workflow is on the repository's default branch. It installs JDK 21, SDK 36,
+Build Tools 36.1.0, NDK 29.0.14206865 and CMake 3.31.5, fetches the pinned
+sources, runs the host HLE and Android JVM tests, builds the native core,
+and packages a signed arm64 Debug APK. The host test command supplies two
+compiler/linker workarounds for existing test harness issues; it does not
+change production compiler flags.
+
+After a successful run, download `hakuX-debug-arm64-<commit>` under the
+run's **Artifacts** and unzip it to obtain `app-debug.apk` and its SHA-256.
+Artifacts are retained for 14 days. No release signing secrets are needed;
+each fresh runner generates a debug signing key, so installing a later
+build may require uninstalling an earlier Debug build first (back up its
+data before doing so). This APK uses the separate `.debug` application ID.
+CI verifies packaging and signing, but cannot verify games on a real device.
 
 ## Host tests
 
