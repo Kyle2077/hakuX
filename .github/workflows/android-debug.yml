@@ -72,7 +72,7 @@ jobs:
 
       - name: Run Android unit tests and assemble Debug APK
         working-directory: android
-        run: bash gradlew --no-daemon --max-workers=2 testDebugUnitTest assembleDebug --stacktrace
+        run: bash ./gradlew --no-daemon --max-workers=2 testDebugUnitTest assembleDebug --stacktrace
 
       - name: Verify APK contents and signature
         run: |
